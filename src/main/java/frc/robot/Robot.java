@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.Elevatorcmd;
+import frc.robot.commands.barge;
 import frc.robot.commands.l3algae;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.LEDSubsystem;
@@ -330,6 +331,50 @@ public class Robot extends LoggedRobot {
         .pov(270)
         .whileTrue(
             drivetrain.applyRequest(() -> forwardStraight.withVelocityX(0).withVelocityY(0.8)));
+
+    
+    joystick
+        .rightStick()
+        .whileTrue(
+            new ConditionalCommand(
+                new Elevatorcmd(elevator1, 2, true),
+                Positionl2, // algae
+                () -> Constants.getRobotState() != Constants.RobotState.ALGEA))
+        .whileFalse(
+            new SequentialCommandGroup(
+                elevator1.Motionmagictoggle(0), new Elevatorcmd(elevator1, 0, false)));
+    // joystick
+    //     .rightStick()
+    //     .whileTrue(new Elevatorcmd(elevator1, 2, true))
+    //     .whileFalse(
+    //         new SequentialCommandGroup(
+    //             elevator1.Motionmagictoggle(0), new Elevatorcmd(elevator1, 0, false)));
+    ;
+    joystick
+        .leftStick()
+        .whileTrue(
+            new ConditionalCommand(
+                new Elevatorcmd(elevator1, 3, true),
+                Positionl3,
+                () -> Constants.getRobotState() != Constants.RobotState.ALGEA))
+        .whileFalse(
+            new SequentialCommandGroup(
+                elevator1.Motionmagictoggle(0),
+                new ParallelCommandGroup(new Elevatorcmd(elevator1, 0, false))));
+
+    joystick
+        .back()
+        .whileTrue(
+            new ConditionalCommand(
+                new Elevatorcmd(elevator1, 4, true),
+                new barge(elevator1, 26.841796875, true),
+                () -> Constants.getRobotState() != Constants.RobotState.ALGEA))
+        .whileFalse(
+            new SequentialCommandGroup(
+                elevator1.Motionmagictoggle(0), new Elevatorcmd(elevator1, 0, false)));
+    joystick.rightBumper().whileTrue(algea.algeacmd(0.5)).whileFalse(algea.algeacmd(0));
+
+    joystick.start().whileTrue(elevator1.runOnce(() -> elevator1.togglesetpoint()));
   }
 
   public Command getAutonomousCommand() {
